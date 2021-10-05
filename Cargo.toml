@@ -12,3 +12,5 @@ rand = "0.8.4"         # first crate to test
 
 [build-dependencies]   # especially for build.rs and bindgen
 bindgen = "0.59.1"  
+cc = "1.0.70"
+pkg-config = "0.3.20"

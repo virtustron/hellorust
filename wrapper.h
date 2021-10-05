@@ -8,4 +8,6 @@
 */
  
 
- #include <bzlib.h>
+ //#include <bzlib.h>
+ #include "src/mygeometry.hpp"
+ #include "src/mymath.hpp"

@@ -7,19 +7,40 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    // Tell cargo to tell rustc to link the system bzip2
-    // shared library.
-    println!("cargo:rustc-link-lib=bz2");
+    
+    // add compiler flags and preprocessor definitions
+    //  original here: https://medium.com/dwelo-r-d/using-c-libraries-in-rust-13961948c72a
+    /*
+    pkg_config::Config::new()
+        .atleast_version("1.2")
+        .probe("z")
+        .unwrap();
+    */
+    let src = [
+        "src/mygeometry.cpp",
+        "src/mymath.cpp",
+    ];
+    
+    let mut builder = cc::Build::new();
+    let build = builder
+        .files(src.iter())
+        .include("include")
+        .flag("-Wno-unused-parameter")
+        .define("USE_ZLIB", None);
+    build.compile("foo");
+    
+    
+    
+    // Tell cargo to tell rustc to link the system bzip2 shared library.
+    //println!("cargo:rustc-link-lib=bz2");
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.h");
 
-    // The bindgen::Builder is the main entry point
-    // to bindgen, and lets you build up options for
+    // The bindgen::Builder is the main entry point to bindgen, and lets you build up options for
     // the resulting bindings.
     let bindings = bindgen::Builder::default()
-        // The input header we would like to generate
-        // bindings for.
+        // The input header we would like to generate bindings for.
         .header("wrapper.h")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
