@@ -24,15 +24,22 @@ fn main() {
     let mut builder = cc::Build::new();
     let build = builder
         .files(src.iter())
+        //.cpp_link_stdlib("stdc++") // use libstdc++
         .include("include")
         .flag("-Wno-unused-parameter")
         .define("USE_ZLIB", None);
     build.compile("bindtest");
     
     
-    
+      
     // Tell cargo to tell rustc to link the system bzip2 shared library.
     //println!("cargo:rustc-link-lib=bz2");
+    
+    let out_dir = env::var("OUT_DIR").unwrap();
+    //println!("\n\n\n{}\n\n\n", out_dir);
+    println!("cargo:rustc-link-search=native={}", out_dir);
+    println!("cargo:rustc-link-lib=static=bindtest");
+
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.h");
@@ -55,4 +62,8 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindtest.rs"))
         .expect("Couldn't write bindings!");
+
+    
+
+    
 }
