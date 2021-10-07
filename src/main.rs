@@ -1,6 +1,6 @@
 use rand::Rng;
 
-include!(concat!(env!("OUT_DIR"), "/bindtest.rs"));
+mod cppmath;
 
 fn main() {
     let random_number = rand::thread_rng().gen_range(0..10);
@@ -8,12 +8,13 @@ fn main() {
 
     
     unsafe {
-        let perimeter = CalculatePerimeter(1, 2, 3);
+        let perimeter = cppmath::CalculatePerimeter(1, 2, 3);
         println!("CalculatePerimeter result: {}", perimeter);
     }
 
     unsafe {
-        let sum = CalculateSum(5, 5);
+        let sum = cppmath::CalculateSum(5, 5);
         println!("CalculateSum result: {}", sum);
     }
+    
 }

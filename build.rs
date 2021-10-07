@@ -3,64 +3,30 @@
 
 extern crate bindgen;
 
-use std::env;
-use std::path::PathBuf;
-
 fn main() {
     
-    // add compiler flags and preprocessor definitions
-    //  original here: https://medium.com/dwelo-r-d/using-c-libraries-in-rust-13961948c72a
-    /*
-    pkg_config::Config::new()
-        .atleast_version("1.2")
-        .probe("z")
-        .unwrap();
-    */
     let src = [
         "src/mygeometry.cpp",
         "src/mymath.cpp",
     ];
     
-    let mut builder = cc::Build::new();
-    let build = builder
+    
+    println!("cargo:rerun-if-changed=src/wrapper.hpp");
+
+    cc::Build::new()
+        .cpp(true)    
         .files(src.iter())
-        //.cpp_link_stdlib("stdc++") // use libstdc++
-        .include("include")
-        .flag("-Wno-unused-parameter")
-        .define("USE_ZLIB", None);
-    build.compile("bindtest");
+        //.file("src/mymath.cpp")
+        .compile("cpp_math");
     
-    
-      
-    // Tell cargo to tell rustc to link the system bzip2 shared library.
-    //println!("cargo:rustc-link-lib=bz2");
-    
-    let out_dir = env::var("OUT_DIR").unwrap();
-    //println!("\n\n\n{}\n\n\n", out_dir);
-    println!("cargo:rustc-link-search=native={}", out_dir);
-    println!("cargo:rustc-link-lib=static=bindtest");
-
-
-    // Tell cargo to invalidate the built crate whenever the wrapper changes
-    println!("cargo:rerun-if-changed=wrapper.h");
-
-    // The bindgen::Builder is the main entry point to bindgen, and lets you build up options for
-    // the resulting bindings.
     let bindings = bindgen::Builder::default()
-        // The input header we would like to generate bindings for.
-        .header("wrapper.h")
-        // Tell cargo to invalidate the built crate whenever any of the
-        // included header files changed.
+        .header("wrapper.hpp")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
-        // Finish the builder and generate the bindings.
         .generate()
-        // Unwrap the Result and panic on failure.
         .expect("Unable to generate bindings");
 
-    // Write the bindings to the $OUT_DIR/bindings.rs file.
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
-        .write_to_file(out_path.join("bindtest.rs"))
+        .write_to_file("src/cppmath.rs")
         .expect("Couldn't write bindings!");
 
     
